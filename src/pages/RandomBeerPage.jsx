@@ -1,55 +1,49 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import beersJSON from "./../assets/beers.json";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
+function RandomBeerPage() {
+  const [randomBeer, setRandomBeer] = useState(null);
 
-function RandomBeersPage() {
-  // Mock initial state, to be replaced by data from the Beers API. Store the beer info retrieved from the Beers API in this state variable.
-  const [randomBeer, setRandomBeer] = useState(beersJSON[0]);
+  useEffect(() => {
+    const fetchRandomBeer = async () => {
+      try {
+        const response = await axios.get(
+          "https://ih-beers-api2.herokuapp.com/beers/random"
+        );
+        setRandomBeer(response.data);
+      } catch (error) {
+        console.error("Error fetching random beer:", error);
+      }
+    };
+    fetchRandomBeer();
+  }, []);
 
-  // React Router hook for navigation. We use it for the back button. You can leave this as it is.
-  const navigate = useNavigate();
+  if (!randomBeer) return <div>Loading...</div>;
 
-
-  
-  // TASKS:
-  // 1. Set up an effect hook to make a request for a random beer from the Beers API.
-  // 2. Use axios to make a HTTP request.
-  // 3. Use the response data from the Beers API to update the state variable.
-
-
-
-  // The logic and the structure for the page showing the random beer. You can leave this as it is.
   return (
-    <div className="d-inline-flex flex-column justify-content-center align-items-center w-100 p-4">
-      <h2>Random Beer</h2>
-
-      {randomBeer && (
-        <>
-          <img
-            src={randomBeer.image_url}
-            alt="beer"
-            height="300px"
-            width="auto"
-          />
-          <h3>{randomBeer.name}</h3>
-          <p>{randomBeer.tagline}</p>
-          <p>Attenuation level: {randomBeer.attenuation_level}</p>
-          <p>Description: {randomBeer.description}</p>
-          <p>Created by: {randomBeer.contributed_by}</p>
-
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              navigate(-1);
-            }}
-          >
-            Back
-          </button>
-        </>
-      )}
+    <div>
+      <img
+        src={randomBeer.image_url}
+        alt={randomBeer.name}
+        style={{ width: "200px" }}
+      />
+      <h1>{randomBeer.name}</h1>
+      <h2>{randomBeer.tagline}</h2>
+      <p>{randomBeer.description}</p>
+      <p>
+        <strong>First Brewed:</strong> {randomBeer.first_brewed}
+      </p>
+      <p>
+        <strong>Brewer's Tips:</strong> {randomBeer.brewers_tips}
+      </p>
+      <p>
+        <strong>Attenuation Level:</strong> {randomBeer.attenuation_level}
+      </p>
+      <p>
+        <strong>Contributed By:</strong> {randomBeer.contributed_by}
+      </p>
     </div>
   );
 }
 
-export default RandomBeersPage;
+export default RandomBeerPage;
